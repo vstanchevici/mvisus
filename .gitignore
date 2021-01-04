@@ -1,3 +1,6 @@
+#Ignore autogenerate tmp_versions
+include/mvisus-version.h
+
 # Ignore build directory 
 build/
 
