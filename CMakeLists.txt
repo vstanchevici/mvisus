@@ -90,7 +90,7 @@ set(IDE_FOLDER "")
 project(${META_PROJECT_NAME} LANGUAGES C CXX)
 
 # Set src and include root path
-set(SRC_ROOT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/src/")
+set(SRC_ROOT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/source/")
 set(INCLUDE_ROOT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 
 # Set output directories
