@@ -8,7 +8,7 @@
 #define MVISUS_VERSION_MAJOR       "1"
 #define MVISUS_VERSION_MINOR       "0"
 #define MVISUS_VERSION_PATCH       "0"
-#define MVISUS_VERSION_REVISION    "3e653cd4b943"
+#define MVISUS_VERSION_REVISION    "a2a64598dedd"
 
 #define MVISUS_VERSION             "1.0.0"
-#define MVISUS_NAME_VERSION        "mvisus v1.0.0 (3e653cd4b943)"
+#define MVISUS_NAME_VERSION        "mvisus v1.0.0 (a2a64598dedd)"
