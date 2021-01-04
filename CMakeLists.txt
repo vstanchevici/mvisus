@@ -18,6 +18,9 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 #set_policy(CMP0063 NEW) # ENABLE CMP0063: Honor visibility properties for all target types.
 #set_policy(CMP0077 NEW) # ENABLE CMP0077: option() honors normal variables
 
+# Remove ZERO_CHECK target
+#set(CMAKE_SUPPRESS_REGENERATION true)
+
 # Include cmake modules
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -86,6 +89,10 @@ set(IDE_FOLDER "")
 # Declare project
 project(${META_PROJECT_NAME} LANGUAGES C CXX)
 
+# Set src and include root path
+set(SRC_ROOT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/src/")
+set(INCLUDE_ROOT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/")
+
 # Set output directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
@@ -95,16 +102,44 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 file(WRITE "${PROJECT_BINARY_DIR}/VERSION" "${META_NAME_VERSION}")
 
 # Generate version-header
-#configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/${META_PROJECT_NAME}/${META_PROJECT_NAME}-version.h @ONLY)
-#configure_file(version.h.in ../include/${META_PROJECT_NAME}-version.h @ONLY)
+configure_file(${INCLUDE_ROOT_PATH}/version.h.in ${INCLUDE_ROOT_PATH}/${META_PROJECT_NAME}-version.h @ONLY)
 
 # detect operating system and host processor
 #message(STATUS "We are on a ${CMAKE_SYSTEM_NAME} system")
 #message(STATUS "The host processor is ${CMAKE_HOST_SYSTEM_PROCESSOR}")
 
-#add_subdirectory(src)
-add_executable(${PROJECT_NAME} src/main.cpp src/Core/App.cpp)
-target_include_directories(${PROJECT_NAME} PRIVATE src)
+file(
+    GLOB_RECURSE SOURCE_LIST 
+    LIST_DIRECTORIES false
+    "${SRC_ROOT_PATH}/*.c"
+    "${SRC_ROOT_PATH}/*.cpp"
+    "${SRC_ROOT_PATH}/*.h"
+    "${SRC_ROOT_PATH}/*.hpp"
+)
+
+file(
+    GLOB_RECURSE INCLUDE_LIST
+    LIST_DIRECTORIES false
+    "${INCLUDE_ROOT_PATH}/*.hpp"
+    "${INCLUDE_ROOT_PATH}/*.h"
+)
+
+add_executable(${PROJECT_NAME} ${INCLUDE_LIST} ${SOURCE_LIST})
+target_include_directories(${PROJECT_NAME} PRIVATE  ${INCLUDE_ROOT_PATH} ${SRC_ROOT_PATH})
+
+foreach(_source IN ITEMS ${SOURCE_LIST})
+    get_filename_component(_source_path "${_source}" PATH)
+    file(RELATIVE_PATH _source_path_rel "${SRC_ROOT_PATH}" "${_source_path}")
+    string(REPLACE "/" "\\" _group_path "${_source_path_rel}")
+    source_group("source\\${_group_path}" FILES "${_source}")
+endforeach()
+
+foreach(_include IN ITEMS ${INCLUDE_LIST})
+    get_filename_component(_include_path "${_include}" PATH)
+    file(RELATIVE_PATH _include_path_rel "${INCLUDE_ROOT_PATH}" "${_include_path}")
+    string(REPLACE "/" "\\" _group_path2 "${_include_path_rel}")
+    source_group("include\\${_group_path2}" FILES "${_include}")
+endforeach()
 
 # 
 # Deployment (global project files)
