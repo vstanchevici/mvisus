@@ -1,13 +1,16 @@
 #include "App.h"
 
-App::App()
+namespace mv
 {
-}
+	App::App()
+	{
+	}
 
-App::~App()
-{
-}
+	App::~App()
+	{
+	}
 
-void App::Run()
-{
+	void App::Run()
+	{
+	}
 }

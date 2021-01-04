@@ -89,10 +89,6 @@ set(IDE_FOLDER "")
 # Declare project
 project(${META_PROJECT_NAME} LANGUAGES C CXX)
 
-# Set src and include root path
-set(SRC_ROOT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/source/")
-set(INCLUDE_ROOT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/")
-
 # Set output directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
@@ -101,21 +97,12 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 # Create version file
 file(WRITE "${PROJECT_BINARY_DIR}/VERSION" "${META_NAME_VERSION}")
 
+# Set src and include root path
+set(SRC_ROOT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/source/")
+set(INCLUDE_ROOT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/")
+
 # Generate version-header
 configure_file(${INCLUDE_ROOT_PATH}/version.h.in ${INCLUDE_ROOT_PATH}/${META_PROJECT_NAME}-version.h @ONLY)
-
-# detect operating system and host processor
-#message(STATUS "We are on a ${CMAKE_SYSTEM_NAME} system")
-#message(STATUS "The host processor is ${CMAKE_HOST_SYSTEM_PROCESSOR}")
-
-file(
-    GLOB_RECURSE SOURCE_LIST 
-    LIST_DIRECTORIES false
-    "${SRC_ROOT_PATH}/*.c"
-    "${SRC_ROOT_PATH}/*.cpp"
-    "${SRC_ROOT_PATH}/*.h"
-    "${SRC_ROOT_PATH}/*.hpp"
-)
 
 file(
     GLOB_RECURSE INCLUDE_LIST
@@ -124,8 +111,25 @@ file(
     "${INCLUDE_ROOT_PATH}/*.h"
 )
 
+file(
+    GLOB_RECURSE SOURCE_LIST
+    LIST_DIRECTORIES false
+    "${SRC_ROOT_PATH}/*.c"
+    "${SRC_ROOT_PATH}/*.cpp"
+    "${SRC_ROOT_PATH}/*.h"
+    "${SRC_ROOT_PATH}/*.hpp"
+)
+
 add_executable(${PROJECT_NAME} ${INCLUDE_LIST} ${SOURCE_LIST})
+
 target_include_directories(${PROJECT_NAME} PRIVATE  ${INCLUDE_ROOT_PATH} ${SRC_ROOT_PATH})
+
+foreach(_include IN ITEMS ${INCLUDE_LIST})
+    get_filename_component(_include_path "${_include}" PATH)
+    file(RELATIVE_PATH _include_path_rel "${INCLUDE_ROOT_PATH}" "${_include_path}")
+    string(REPLACE "/" "\\" _group_path2 "${_include_path_rel}")
+    source_group("include\\${_group_path2}" FILES "${_include}")
+endforeach()
 
 foreach(_source IN ITEMS ${SOURCE_LIST})
     get_filename_component(_source_path "${_source}" PATH)
@@ -134,12 +138,14 @@ foreach(_source IN ITEMS ${SOURCE_LIST})
     source_group("source\\${_group_path}" FILES "${_source}")
 endforeach()
 
-foreach(_include IN ITEMS ${INCLUDE_LIST})
-    get_filename_component(_include_path "${_include}" PATH)
-    file(RELATIVE_PATH _include_path_rel "${INCLUDE_ROOT_PATH}" "${_include_path}")
-    string(REPLACE "/" "\\" _group_path2 "${_include_path_rel}")
-    source_group("include\\${_group_path2}" FILES "${_include}")
-endforeach()
+#https://stackoverflow.com/questions/6352123/multiple-directories-under-cmake
+
+#message(STATUS "INCLUDE_LIST -> ${INCLUDE_LIST}")
+#message(STATUS "SOURCE_LIST -> ${SOURCE_LIST}")
+
+# detect operating system and host processor
+#message(STATUS "We are on a ${CMAKE_SYSTEM_NAME} system")
+#message(STATUS "The host processor is ${CMAKE_HOST_SYSTEM_PROCESSOR}")
 
 # 
 # Deployment (global project files)

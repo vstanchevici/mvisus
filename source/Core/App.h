@@ -1,22 +1,25 @@
 #ifndef _APP_H_
 #define _APP_H_
 
-/*!
-*	\brief App is a class
-*/
-class App
+namespace mv
 {
+	/*!
+	*	\brief App is a class
+	*/
+	class App
+	{
 	public:
 		App();
 		~App();
 
 	private:
-        int a;
-        
+		int a;
+
 	public:
-        void Run();
+		void Run();
 
-};
+	};
 
+}
 
 #endif
