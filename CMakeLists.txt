@@ -120,10 +120,6 @@ file(
     "${SRC_ROOT_PATH}/*.hpp"
 )
 
-add_executable(${PROJECT_NAME} ${INCLUDE_LIST} ${SOURCE_LIST})
-
-target_include_directories(${PROJECT_NAME} PRIVATE  ${INCLUDE_ROOT_PATH} ${SRC_ROOT_PATH})
-
 foreach(_include IN ITEMS ${INCLUDE_LIST})
     get_filename_component(_include_path "${_include}" PATH)
     file(RELATIVE_PATH _include_path_rel "${INCLUDE_ROOT_PATH}" "${_include_path}")
@@ -138,19 +134,54 @@ foreach(_source IN ITEMS ${SOURCE_LIST})
     source_group("source\\${_group_path}" FILES "${_source}")
 endforeach()
 
+
+add_executable(${PROJECT_NAME} ${INCLUDE_LIST} ${SOURCE_LIST})
+target_include_directories(${PROJECT_NAME} PRIVATE  ${INCLUDE_ROOT_PATH} ${SRC_ROOT_PATH})
+
+#
+# Start adding libraries
+#
+
+include(ExternalProject)
+
+set(OpenBLAS "OpenBLAS")
+set(OpenBLASIncludeDir "")
+set(OpenBLASLibDir "")
+set(OpenBLASLibName "")
+add_subdirectory(third_party/OpenBLAS)
+
+
+add_dependencies(${PROJECT_NAME} ${OpenBLAS})
+target_include_directories(${PROJECT_NAME} PRIVATE ${OpenBLASIncludeDir})
+target_link_directories(${PROJECT_NAME} PRIVATE ${OpenBLASLibDir})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${OpenBLASLibName})
+
+
+set(Armadillo "Armadillo")
+set(ArmadilloIncludeDir "")
+set(ArmadilloLibDir "")
+set(ArmadilloLibName "")
+add_subdirectory(third_party/Armadillo)
+
+
+add_dependencies(${Armadillo} ${OpenBLAS})
+add_dependencies(${PROJECT_NAME} ${Armadillo})
+target_include_directories(${PROJECT_NAME} PRIVATE ${ArmadilloIncludeDir})
+target_link_directories(${PROJECT_NAME} PRIVATE ${ArmadilloLibDir})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${ArmadilloLibName})
+
+
+
 #https://stackoverflow.com/questions/6352123/multiple-directories-under-cmake
+#https://stackoverflow.com/questions/51675100/how-can-i-prevent-a-cmake-external-project-from-updating-reinstalling-whenever
 
-#message(STATUS "INCLUDE_LIST -> ${INCLUDE_LIST}")
-#message(STATUS "SOURCE_LIST -> ${SOURCE_LIST}")
-
-# detect operating system and host processor
-#message(STATUS "We are on a ${CMAKE_SYSTEM_NAME} system")
-#message(STATUS "The host processor is ${CMAKE_HOST_SYSTEM_PROCESSOR}")
+#set(var2 "var2" CACHE INTERNAL "")
 
 # 
 # Deployment (global project files)
 # 
 
 # Install version file
+#message(STATUS "some message ...")
 #set(INSTALL_ROOT      "./test/")       # /usr/[local]/share/<project>
 #install(FILES "${PROJECT_BINARY_DIR}/VERSION" DESTINATION ${INSTALL_ROOT} COMPONENT runtime)
