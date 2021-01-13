@@ -2,8 +2,9 @@
 #include <Core/MLTest.h>
 #include <iostream>
 
-#include <openblas/cblas.h>
+//#include <openblas/cblas.h>
 
+/*
 void test_open_blas()
 {
     int i = 0;
@@ -17,11 +18,12 @@ void test_open_blas()
 
     std::cout << std::endl;
 }
-
+*/
 
 int main(int argc, char* argv[])
 {
-    std::cout << "!Project Name: " << MVISUS_PROJECT_DESCRIPTION << std::endl;
+    std::cout << "Project Name: " << MVISUS_PROJECT_NAME << std::endl;
+    std::cout << "Project Description: " << MVISUS_PROJECT_DESCRIPTION << std::endl;
     mv::MLTest app;
     app.Run();
     //test_open_blas();
