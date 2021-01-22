@@ -3,6 +3,7 @@
 #include <mlpack/core.hpp>
 #include <mlpack/methods/neighbor_search/neighbor_search.hpp>
 #include <iostream>
+//#include <armadillo>
 
 using namespace mlpack;
 using namespace mlpack::neighbor; // NeighborSearch and NearestNeighborSort
@@ -21,8 +22,6 @@ namespace mv
 
 	void MLTest::Run()
 	{
-
-
         // Load the data from data.csv (hard-coded).  Use CLI for simple command-line
         // parameter handling.
         arma::mat data("0.339406815,0.843176636,0.472701471; \
@@ -49,5 +48,25 @@ namespace mv
             std::cout << "Nearest neighbor of point " << i << " is point "
                 << neighbors[i] << " and the distance is " << distances[i] << "." << std::endl;
         }
+
+        //arma::arma_rng::set_seed_random();
+        //
+        //// Create a 4x4 random matrix and print it on the screen
+        //arma::Mat<double> A = arma::randu(4,4);
+        //std::cout << "A:\n" << A << "\n";
+        //
+        //// Multiply A with his transpose:
+        //std::cout << "A * A.t() =\n";
+        //std::cout << A * A.t() << "\n";
+        //
+        //// Access/Modify rows and columns from the array:
+        //A.row(0) = A.row(1) + A.row(3);
+        //A.col(3).zeros();
+        //std::cout << "add rows 1 and 3, store result in row 0, also fill 4th column with zeros:\n";
+        //std::cout << "A:\n" << A << "\n";
+        //
+        //// Create a new diagonal matrix using the main diagonal of A:
+        //arma::Mat<double>B = arma::diagmat(A);
+        //std::cout << "B:\n" << B << "\n";
 	}
 }

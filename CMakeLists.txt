@@ -65,10 +65,12 @@ set(META_VERSION_PATCH       "0")
 set(META_VERSION_REVISION    "${GIT_REV}")
 set(META_VERSION             "${META_VERSION_MAJOR}.${META_VERSION_MINOR}.${META_VERSION_PATCH}")
 set(META_NAME_VERSION        "${META_PROJECT_NAME} v${META_VERSION} (${META_VERSION_REVISION})")
-set(META_CMAKE_INIT_SHA      "${GIT_REV}")
+set(META_CMAKE_INIT_SHA      "${GIT_SHA1}")
 
 string(MAKE_C_IDENTIFIER ${META_PROJECT_NAME} META_PROJECT_ID)
 string(TOUPPER ${META_PROJECT_ID} META_PROJECT_ID)
+
+#https://awesomeopensource.com/project/cginternals/cmake-init
 
 # 
 # Project configuration options
@@ -152,12 +154,13 @@ target_include_directories(${PROJECT_NAME} PRIVATE  ${INCLUDE_ROOT_PATH} ${SRC_R
 include(ExternalProject)
 
 #Adding OpenBLAS library
-set(openblas "openblas")
-set(OPENBLAS_INCLUDE_DIR "")
-set(OPENBLAS_LIB_DIR "")
-set(OPENBLAS_LIB_NAME "")
-add_subdirectory(third_party/${openblas})
+#later must see how to integrate
+#set(openblas "openblas")
+#set(OPENBLAS_INCLUDE_DIR "")
+#set(OPENBLAS_LIB_DIR "")
+#set(OPENBLAS_LIB_NAME "")
 
+#add_subdirectory(third_party/${openblas})
 #add_dependencies(${PROJECT_NAME} ${openblas})
 #target_include_directories(${PROJECT_NAME} PRIVATE ${OPENBLAS_INCLUDE_DIR})
 #target_link_directories(${PROJECT_NAME} PRIVATE ${OPENBLAS_LIB_DIR})
@@ -172,11 +175,11 @@ set(ARMADILLO_LIB_NAME "")
 add_subdirectory(third_party/${armadillo})
 
 
-add_dependencies(${armadillo} ${openblas})
-#add_dependencies(${PROJECT_NAME} ${armadillo})
+#add_dependencies(${armadillo} ${openblas})
+add_dependencies(${PROJECT_NAME} ${armadillo})
 target_include_directories(${PROJECT_NAME} PRIVATE ${ARMADILLO_INCLUDE_DIR})
-#target_link_directories(${PROJECT_NAME} PRIVATE ${ARMADILLO_LIB_DIR})
-#target_link_libraries(${PROJECT_NAME} PRIVATE ${ARMADILLO_LIB_NAME})
+target_link_directories(${PROJECT_NAME} PRIVATE ${ARMADILLO_LIB_DIR})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${ARMADILLO_LIB_NAME})
 
 
 #Adding Boost library
@@ -187,7 +190,7 @@ set(BOOST_LIB_NAME "")
 add_subdirectory(third_party/${boost})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${BOOST_IMCLUDE_DIR})
-#target_link_directories(${PROJECT_NAME} PRIVATE ${BOOST_LIB_DIR})
+target_link_directories(${PROJECT_NAME} PRIVATE ${BOOST_LIB_DIR})
 #target_link_libraries(${PROJECT_NAME} PRIVATE ${BOOST_LIB_NAME})
 
 
@@ -213,6 +216,9 @@ add_dependencies(${PROJECT_NAME} ${mlpack})
 target_include_directories(${PROJECT_NAME} PRIVATE ${MLPACK_INCLUDE_DIR})
 target_link_directories(${PROJECT_NAME} PRIVATE ${MLPACK_LIB_DIR})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${MLPACK_LIB_NAME})
+
+
+
 
 
 
