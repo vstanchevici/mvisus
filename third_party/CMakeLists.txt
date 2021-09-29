@@ -140,40 +140,99 @@ foreach(_source IN ITEMS ${SOURCE_LIST})
     source_group("source\\${_group_path}" FILES "${_source}")
 endforeach()
 
+
 add_executable(${PROJECT_NAME} ${INCLUDE_LIST} ${SOURCE_LIST})
 target_include_directories(${PROJECT_NAME} PRIVATE  ${INCLUDE_ROOT_PATH} ${SRC_ROOT_PATH})
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    #set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-endif()
-
-if (DEFINED LIBRARIES_INSTALL_PREFIX)
-    list(APPEND CMAKE_PREFIX_PATH ${LIBRARIES_INSTALL_PREFIX}/mlpack)
-    list(APPEND CMAKE_PREFIX_PATH ${LIBRARIES_INSTALL_PREFIX}/boost)
-    list(APPEND CMAKE_PREFIX_PATH ${LIBRARIES_INSTALL_PREFIX}/armadillo)
-    message(STATUS "CMAKE_PREFIX_PATH: " ${CMAKE_PREFIX_PATH})
-endif()
-
-find_package(Armadillo REQUIRED)
-target_include_directories(${PROJECT_NAME} PRIVATE ${ARMADILLO_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${ARMADILLO_LIBRARIES})
-#message(STATUS "ARMADILLO_INCLUDE_DIRS: " ${ARMADILLO_INCLUDE_DIRS})
-#message(STATUS "ARMADILLO_LIBRARIES: " ${ARMADILLO_LIBRARIES})
-
-#https://cmake.org/cmake/help/latest/module/FindBoost.html
-set(Boost_USE_STATIC_RUNTIME     ON)
-find_package(Boost REQUIRED COMPONENTS serialization program_options unit_test_framework log)
-
-message(STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
-target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${Boost_LIBRARIES})
 
 
-#https://stackoverflow.com/questions/59729745/cmake-mlpack-ubuntu-issue
-find_package(MLPACK REQUIRED)
+#
+# Start adding libraries
+#
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${MLPACK_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${MLPACK_LIBRARIES})
-message(STATUS "MLPACK_INCLUDE_DIRS: " ${MLPACK_INCLUDE_DIRS})
-message(STATUS "MLPACK_LIBRARY: " ${MLPACK_LIBRARIES})
+#include cmake module
+include(ExternalProject)
+
+#Adding OpenBLAS library
+#later must see how to integrate
+#set(openblas "openblas")
+#set(OPENBLAS_INCLUDE_DIR "")
+#set(OPENBLAS_LIB_DIR "")
+#set(OPENBLAS_LIB_NAME "")
+
+#add_subdirectory(third_party/${openblas})
+#add_dependencies(${PROJECT_NAME} ${openblas})
+#target_include_directories(${PROJECT_NAME} PRIVATE ${OPENBLAS_INCLUDE_DIR})
+#target_link_directories(${PROJECT_NAME} PRIVATE ${OPENBLAS_LIB_DIR})
+#target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENBLAS_LIB_NAME})
+
+
+#Adding Armadillo library
+set(armadillo "armadillo")
+set(ARMADILLO_INCLUDE_DIR "")
+set(ARMADILLO_LIB_DIR "")
+set(ARMADILLO_LIB_NAME "")
+add_subdirectory(third_party/${armadillo})
+
+
+#add_dependencies(${armadillo} ${openblas})
+add_dependencies(${PROJECT_NAME} ${armadillo})
+target_include_directories(${PROJECT_NAME} PRIVATE ${ARMADILLO_INCLUDE_DIR})
+target_link_directories(${PROJECT_NAME} PRIVATE ${ARMADILLO_LIB_DIR})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${ARMADILLO_LIB_NAME})
+
+
+#Adding Boost library
+set(boost "boost")
+set(BOOST_IMCLUDE_DIR "")
+set(BOOST_LIB_DIR "")
+set(BOOST_LIB_NAME "")
+add_subdirectory(third_party/${boost})
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${BOOST_IMCLUDE_DIR})
+target_link_directories(${PROJECT_NAME} PRIVATE ${BOOST_LIB_DIR})
+#target_link_libraries(${PROJECT_NAME} PRIVATE ${BOOST_LIB_NAME})
+
+
+#Adding cereal library
+set(cereal "cereal")
+set(CEREAL_INCLUDE_DIR "")
+add_subdirectory(third_party/${cereal})
+
+add_dependencies(${cereal} ${boost})
+target_include_directories(${PROJECT_NAME} PRIVATE ${CEREAL_INCLUDE_DIR})
+
+
+#Adding mlpack library
+set(mlpack "mlpack")
+set(MLPACK_INCLUDE_DIR "")
+set(MLPACK_LIB_DIR "")
+set(MLPACK_LIB_NAME "")
+add_subdirectory(third_party/${mlpack})
+
+add_dependencies(${mlpack} ${cereal})
+add_dependencies(${mlpack} ${armadillo})
+add_dependencies(${PROJECT_NAME} ${mlpack})
+target_include_directories(${PROJECT_NAME} PRIVATE ${MLPACK_INCLUDE_DIR})
+target_link_directories(${PROJECT_NAME} PRIVATE ${MLPACK_LIB_DIR})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${MLPACK_LIB_NAME})
+
+
+
+
+
+
+#https://stackoverflow.com/questions/3016448/how-can-i-get-cmake-to-find-my-alternative-boost-installation
+#https://stackoverflow.com/questions/6352123/multiple-directories-under-cmake
+#https://stackoverflow.com/questions/51675100/how-can-i-prevent-a-cmake-external-project-from-updating-reinstalling-whenever
+
+#set(var2 "var2" CACHE INTERNAL "")
+
+# 
+# Deployment (global project files)
+# 
+
+# Install version file
+#message(STATUS "some message ...")
+#set(INSTALL_ROOT      "./test/")       # /usr/[local]/share/<project>
+#install(FILES "${PROJECT_BINARY_DIR}/VERSION" DESTINATION ${INSTALL_ROOT} COMPONENT runtime)
