@@ -76,7 +76,7 @@ ExternalProject_Add(armadillo
     PREFIX                  ${LIBRARIES_PREFIX}/armadillo
     GIT_REPOSITORY          https://gitlab.com/conradsnicta/armadillo-code.git
     GIT_TAG                 10.7.x
-    CMAKE_ARGS              -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/armadillo
+    CMAKE_ARGS              -DCMAKE_DEBUG_POSTFIX=$<$<CONFIG:Debug>:d> -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/armadillo
     CMAKE_CACHE_ARGS        -DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY} 
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
@@ -93,14 +93,14 @@ ExternalProject_Add(cereal
     DEPENDS                 boost
     GIT_REPOSITORY          https://github.com/USCiLab/cereal.git
     GIT_TAG                 v1.3.0
-    CMAKE_ARGS              -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/cereal -DCMAKE_PREFIX_PATH:PATH=${LIBRARIES_INSTALL_PREFIX}/boost -DJUST_INSTALL_CEREAL:BOOL=TRUE
+    CMAKE_ARGS              -DCMAKE_DEBUG_POSTFIX=$<$<CONFIG:Debug>:d> -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/cereal -DCMAKE_PREFIX_PATH:PATH=${LIBRARIES_INSTALL_PREFIX}/boost -DJUST_INSTALL_CEREAL:BOOL=TRUE
     CMAKE_CACHE_ARGS        -DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY} 
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
     BUILD_ALWAYS            FALSE
 )
 
-
+#https://www.statwks.com/c/
 ExternalProject_Add(mlpack
     PREFIX                  ${LIBRARIES_PREFIX}/mlpack
     DEPENDS                 cereal armadillo
@@ -114,6 +114,7 @@ ExternalProject_Add(mlpack
                             -DBUILD_R_BINDINGS:BOOl=OFF
                             -DBUILD_CLI_EXECUTABLES:BOOL=OFF
                             -DBUILD_GO_BINDINGS:BOOL=OFF
+                            -DCMAKE_DEBUG_POSTFIX=$<$<CONFIG:Debug>:d>
                             -DCMAKE_PREFIX_PATH=${LIBRARIES_INSTALL_PREFIX}
                             -DARMADILLO_INCLUDE_DIR:PATH=${LIBRARIES_INSTALL_PREFIX}/armadillo/include
                             -DARMADILLO_LIBRARY:FILEPATH=${LIBRARIES_INSTALL_PREFIX}/armadillo/lib/armadillo.lib
