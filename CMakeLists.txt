@@ -144,8 +144,8 @@ add_executable(${PROJECT_NAME} ${INCLUDE_LIST} ${SOURCE_LIST})
 target_include_directories(${PROJECT_NAME} PRIVATE  ${INCLUDE_ROOT_PATH} ${SRC_ROOT_PATH})
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    #set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+    #set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 endif()
 
 if (DEFINED LIBRARIES_INSTALL_PREFIX)
@@ -162,8 +162,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${ARMADILLO_LIBRARIES})
 #message(STATUS "ARMADILLO_LIBRARIES: " ${ARMADILLO_LIBRARIES})
 
 #https://cmake.org/cmake/help/latest/module/FindBoost.html
-set(Boost_USE_STATIC_RUNTIME     ON)
-find_package(Boost REQUIRED COMPONENTS serialization program_options unit_test_framework log)
+set(Boost_USE_STATIC_RUNTIME     OFF)
+find_package(Boost REQUIRED COMPONENTS serialization unit_test_framework)
 
 message(STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
 target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})

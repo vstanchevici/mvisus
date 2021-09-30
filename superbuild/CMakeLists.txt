@@ -17,7 +17,7 @@ project(mvisus-superbuild LANGUAGES C CXX)
 
 
 # Set standard
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
@@ -47,6 +47,13 @@ elseif (UNIX)
     set(EXE_EXTENSION "")
 endif()
 
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    #https://discourse.cmake.org/t/how-to-set-cmake-msvc-runtime-library-for-an-external-project/2805/4
+    #set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    #set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+    #set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+endif()
 
 ExternalProject_Add(boost
     PREFIX                  ${LIBRARIES_PREFIX}/boost
@@ -56,7 +63,7 @@ ExternalProject_Add(boost
     GIT_SUBMODULES_RECURSE  1
     BUILD_IN_SOURCE         ON
     CONFIGURE_COMMAND       ./bootstrap${SHELL_EXTENSION}
-    BUILD_COMMAND           ./b2${EXE_EXTENSION} link=static variant=$<IF:$<CONFIG:Debug>,debug,release> threading=multi runtime-link=static address-model=64 threading=multi --without-python -j ${CPU_COUNT} install --prefix=${LIBRARIES_INSTALL_PREFIX}/boost
+    BUILD_COMMAND           ./b2${EXE_EXTENSION} link=static variant=$<IF:$<CONFIG:Debug>,debug,release> threading=multi runtime-link=shared address-model=64 threading=multi --without-python -j ${CPU_COUNT} install --prefix=${LIBRARIES_INSTALL_PREFIX}/boost
     
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
@@ -64,11 +71,13 @@ ExternalProject_Add(boost
     INSTALL_COMMAND         ""
 )
 
+
 ExternalProject_Add(armadillo
     PREFIX                  ${LIBRARIES_PREFIX}/armadillo
     GIT_REPOSITORY          https://gitlab.com/conradsnicta/armadillo-code.git
     GIT_TAG                 10.7.x
     CMAKE_ARGS              -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/armadillo
+    CMAKE_CACHE_ARGS        -DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY} 
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
     BUILD_ALWAYS            FALSE
@@ -78,18 +87,20 @@ ExternalProject_Add(armadillo
     #TEST_COMMAND           ""
 )
 
+
 ExternalProject_Add(cereal
     PREFIX                  ${LIBRARIES_PREFIX}/cereal
     DEPENDS                 boost
     GIT_REPOSITORY          https://github.com/USCiLab/cereal.git
     GIT_TAG                 v1.3.0
     CMAKE_ARGS              -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/cereal -DCMAKE_PREFIX_PATH:PATH=${LIBRARIES_INSTALL_PREFIX}/boost -DJUST_INSTALL_CEREAL:BOOL=TRUE
+    CMAKE_CACHE_ARGS        -DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY} 
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
     BUILD_ALWAYS            FALSE
 )
 
-list(APPEND CMAKE_PREFIX_PATH ${LIBRARIES_INSTALL_PREFIX}/armadillo)
+
 ExternalProject_Add(mlpack
     PREFIX                  ${LIBRARIES_PREFIX}/mlpack
     DEPENDS                 cereal armadillo
@@ -113,6 +124,8 @@ ExternalProject_Add(mlpack
                             -DBoost_SERIALIZATION_LIBRARY_RELEASE:FILEPATH=${LIBRARIES_INSTALL_PREFIX}/lib/libboost_serialization-vc142-mt-sgd-x64-1_74.lib
                             -DBoost_UNIT_TEST_FRAMEWORK_LIBRARY_DEBUG:FILEPATH=${LIBRARIES_INSTALL_PREFIX}/boost/lib/libboost_unit_test_framework-vc142-mt-sgd-x64-1_74.lib
                             -DBoost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE:FILEPATH=${LIBRARIES_INSTALL_PREFIX}/boost/lib/libboost_unit_test_framework-vc142-mt-sgd-x64-1_74.lib
+
+    CMAKE_CACHE_ARGS        -DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY} 
 
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
