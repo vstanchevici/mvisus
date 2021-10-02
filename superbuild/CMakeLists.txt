@@ -63,7 +63,7 @@ ExternalProject_Add(boost
     GIT_SUBMODULES_RECURSE  1
     BUILD_IN_SOURCE         ON
     CONFIGURE_COMMAND       ./bootstrap${SHELL_EXTENSION}
-    BUILD_COMMAND           ./b2${EXE_EXTENSION} link=static variant=$<IF:$<CONFIG:Debug>,debug,release> threading=multi runtime-link=shared address-model=64 threading=multi --without-python -j ${CPU_COUNT} install --prefix=${LIBRARIES_INSTALL_PREFIX}/boost
+    BUILD_COMMAND           ./b2${EXE_EXTENSION} link=static variant=$<IF:$<CONFIG:Debug>,debug,release> threading=multi runtime-link=shared address-model=64 --without-python -j ${CPU_COUNT} install --prefix=${LIBRARIES_INSTALL_PREFIX}/boost
     
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
@@ -77,7 +77,7 @@ ExternalProject_Add(armadillo
     GIT_REPOSITORY          https://gitlab.com/conradsnicta/armadillo-code.git
     GIT_TAG                 10.7.x
     CMAKE_ARGS              -DCMAKE_DEBUG_POSTFIX=$<$<CONFIG:Debug>:d> -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/armadillo
-    CMAKE_CACHE_ARGS        -DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY} 
+    #CMAKE_CACHE_ARGS        -DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY} 
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
     BUILD_ALWAYS            FALSE
@@ -94,7 +94,7 @@ ExternalProject_Add(cereal
     GIT_REPOSITORY          https://github.com/USCiLab/cereal.git
     GIT_TAG                 v1.3.0
     CMAKE_ARGS              -DCMAKE_DEBUG_POSTFIX=$<$<CONFIG:Debug>:d> -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/cereal -DCMAKE_PREFIX_PATH:PATH=${LIBRARIES_INSTALL_PREFIX}/boost -DJUST_INSTALL_CEREAL:BOOL=TRUE
-    CMAKE_CACHE_ARGS        -DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY} 
+    #CMAKE_CACHE_ARGS        -DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY} 
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
     BUILD_ALWAYS            FALSE
@@ -107,26 +107,21 @@ ExternalProject_Add(mlpack
     GIT_REPOSITORY          https://github.com/mlpack/mlpack.git
     GIT_TAG                 3.4.2
     CMAKE_ARGS              -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/mlpack 
-                            -DBUILD_TESTS:BOOL=OFF
+                            -DCMAKE_DEBUG_POSTFIX=$<$<CONFIG:Debug>:d>
+                            -DCMAKE_PREFIX_PATH=${LIBRARIES_INSTALL_PREFIX}/armadillo
+                            -DBOOST_ROOT=${LIBRARIES_INSTALL_PREFIX}/boost
+
+    CMAKE_CACHE_ARGS        -DBUILD_TESTS:BOOL=OFF
                             -DBUILD_SHARED_LIBS:BOOL=OFF
                             -DDOWNLOAD_ENSMALLEN:BOOL=ON
-                            -DDOWNLOAD_STB_IMAGE:BOOL=OFF
+                            -DDOWNLOAD_STB_IMAGE:BOOL=ON
                             -DBUILD_R_BINDINGS:BOOl=OFF
                             -DBUILD_CLI_EXECUTABLES:BOOL=OFF
                             -DBUILD_GO_BINDINGS:BOOL=OFF
-                            -DCMAKE_DEBUG_POSTFIX=$<$<CONFIG:Debug>:d>
-                            -DCMAKE_PREFIX_PATH=${LIBRARIES_INSTALL_PREFIX}
-                            -DARMADILLO_INCLUDE_DIR:PATH=${LIBRARIES_INSTALL_PREFIX}/armadillo/include
-                            -DARMADILLO_LIBRARY:FILEPATH=${LIBRARIES_INSTALL_PREFIX}/armadillo/lib/armadillo.lib
-                            -DBoost_INCLUDE_DIR:PATH=${LIBRARIES_INSTALL_PREFIX}/boost/include/boost-1_74
-                            -DBoost_LIBRARY_DIR_DEBUG:PATH=${LIBRARIES_INSTALL_PREFIX}/boost/lib
-                            -DBoost_LIBRARY_DIR_RELEASE:PATH=${LIBRARIES_INSTALL_PREFIX}/boost/lib
-                            -DBoost_SERIALIZATION_LIBRARY_DEBUG:FILEPATH=${LIBRARIES_INSTALL_PREFIX}/boost/lib/libboost_serialization-vc142-mt-sgd-x64-1_74.lib
-                            -DBoost_SERIALIZATION_LIBRARY_RELEASE:FILEPATH=${LIBRARIES_INSTALL_PREFIX}/lib/libboost_serialization-vc142-mt-sgd-x64-1_74.lib
-                            -DBoost_UNIT_TEST_FRAMEWORK_LIBRARY_DEBUG:FILEPATH=${LIBRARIES_INSTALL_PREFIX}/boost/lib/libboost_unit_test_framework-vc142-mt-sgd-x64-1_74.lib
-                            -DBoost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE:FILEPATH=${LIBRARIES_INSTALL_PREFIX}/boost/lib/libboost_unit_test_framework-vc142-mt-sgd-x64-1_74.lib
-
-    CMAKE_CACHE_ARGS        -DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY} 
+                            -DBoost_DEBUG:BOOL=ON
+                            -DBoost_USE_STATIC_RUNTIME:BOOL=OFF
+                            -DBoost_LIB_PREFIX:STRING=lib
+                            #-DBoost_NO_BOOST_CMAKE:BOOL=FALSE -DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY}
 
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
