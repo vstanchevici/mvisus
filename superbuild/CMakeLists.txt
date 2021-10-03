@@ -8,7 +8,7 @@
 # Set CMake version
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
-
+#[[
 #https://discourse.cmake.org/t/how-to-set-cmake-msvc-runtime-library-for-an-external-project/2805/4
 #set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 #set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
@@ -24,6 +24,7 @@ if (POLICY CMP0091)
 elseif (DEFINED CMAKE_MSVC_RUNTIME_LIBRARY)
     message(FATAL_ERROR "CMAKE_MSVC_RUNTIME_LIBRARY was defined while policy CMP0091 is not available. Use CMake 3.15 or newer.")
 endif()
+]]
 
 #
 # Configure CMake environment
@@ -87,7 +88,6 @@ ExternalProject_Add(armadillo
     GIT_REPOSITORY          https://gitlab.com/conradsnicta/armadillo-code.git
     GIT_TAG                 10.7.x
     CMAKE_ARGS              -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/armadillo #-DCMAKE_DEBUG_POSTFIX=$<$<CONFIG:Debug>:d>  they dont support this now
-    #CMAKE_CACHE_ARGS        -DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY} 
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
     BUILD_ALWAYS            FALSE
@@ -104,7 +104,6 @@ ExternalProject_Add(cereal
     GIT_REPOSITORY          https://github.com/USCiLab/cereal.git
     GIT_TAG                 v1.3.0
     CMAKE_ARGS              -DCMAKE_DEBUG_POSTFIX=$<$<CONFIG:Debug>:d> -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/cereal -DCMAKE_PREFIX_PATH:PATH=${LIBRARIES_INSTALL_PREFIX}/boost -DJUST_INSTALL_CEREAL:BOOL=TRUE
-    #CMAKE_CACHE_ARGS        -DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY} 
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
     BUILD_ALWAYS            FALSE
@@ -130,14 +129,13 @@ ExternalProject_Add(mlpack
                             -DBoost_DEBUG:BOOL=ON
                             -DBoost_USE_STATIC_RUNTIME:BOOL=OFF
                             -DBoost_LIB_PREFIX:STRING=lib
-                            #-DCMAKE_MSVC_RUNTIME_LIBRARY:STRING=MultiThreaded$<$<CONFIG:Debug>:Debug>
-                            #-DBoost_NO_BOOST_CMAKE:BOOL=FALSE 
+                            #-DBoost_NO_BOOST_CMAKE:BOOL=FALSE
 
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
     BUILD_ALWAYS            FALSE
 )
-#set_property(TARGET mlpack PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#set_property(TARGET mlpack PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>") - not working
 
 ExternalProject_Add(mvisus
     PREFIX              ${LIBRARIES_PREFIX}/mvisus
