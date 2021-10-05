@@ -151,12 +151,29 @@ ExternalProject_Add(glfw
     BUILD_ALWAYS            FALSE
 )
 
+ExternalProject_Add(imgui
+    PREFIX                  ${LIBRARIES_PREFIX}/imgui
+    DEPENDS                 glfw
+    GIT_REPOSITORY          https://github.com/ocornut/imgui.git
+    GIT_TAG                 v1.84.2
+    UPDATE_DISCONNECTED     TRUE
+    UPDATE_COMMAND          ""
+    CONFIGURE_COMMAND       ""
+    BUILD_COMMAND           ""
+    INSTALL_COMMAND         ""
+)
+ExternalProject_Get_property(imgui SOURCE_DIR)
+set(IMGUI_SOURCE_DIR ${SOURCE_DIR})
+
 ExternalProject_Add(mvisus
     PREFIX              ${LIBRARIES_PREFIX}/mvisus
-    DEPENDS             mlpack glfw
+    DEPENDS             mlpack imgui
     SOURCE_DIR          ${PROJECT_SOURCE_DIR}/../
     CMAKE_ARGS          -DBoost_USE_STATIC_RUNTIME:BOOL=OFF #-DLIBRARIES_INSTALL_PREFIX=${LIBRARIES_INSTALL_PREFIX} -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-    CMAKE_CACHE_ARGS    -DCMAKE_PREFIX_PATH:STRING="${LIBRARIES_INSTALL_PREFIX}/armadillo;${LIBRARIES_INSTALL_PREFIX}/mlpack;" -DBOOST_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/boost -DGLFW3_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/glfw
+    CMAKE_CACHE_ARGS    -DCMAKE_PREFIX_PATH:STRING="${LIBRARIES_INSTALL_PREFIX}/armadillo;${LIBRARIES_INSTALL_PREFIX}/mlpack;"
+                        -DBOOST_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/boost
+                        -DGLFW3_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/glfw
+                        -DIMGUI_PATH:PATH=${IMGUI_SOURCE_DIR}
     BUILD_ALWAYS        TRUE
     INSTALL_COMMAND     ""
 )
