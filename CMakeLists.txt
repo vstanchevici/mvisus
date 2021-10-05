@@ -148,13 +148,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 endif()
 
-if (DEFINED LIBRARIES_INSTALL_PREFIX)
-    list(APPEND CMAKE_PREFIX_PATH ${LIBRARIES_INSTALL_PREFIX}/mlpack)
-    list(APPEND CMAKE_PREFIX_PATH ${LIBRARIES_INSTALL_PREFIX}/boost)
-    list(APPEND CMAKE_PREFIX_PATH ${LIBRARIES_INSTALL_PREFIX}/armadillo)
-    message(STATUS "CMAKE_PREFIX_PATH: " ${CMAKE_PREFIX_PATH})
-endif()
-
 find_package(Armadillo REQUIRED)
 target_include_directories(${PROJECT_NAME} PRIVATE ${ARMADILLO_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${ARMADILLO_LIBRARIES})
@@ -162,18 +155,14 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${ARMADILLO_LIBRARIES})
 #message(STATUS "ARMADILLO_LIBRARIES: " ${ARMADILLO_LIBRARIES})
 
 #https://cmake.org/cmake/help/latest/module/FindBoost.html
-set(Boost_USE_STATIC_RUNTIME     OFF)
 find_package(Boost REQUIRED COMPONENTS serialization unit_test_framework)
-
-message(STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
 target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${Boost_LIBRARIES})
-
+#message(STATUS "Boost_LIBRARIES: ${Boost_LIBRARIES}")
 
 #https://stackoverflow.com/questions/59729745/cmake-mlpack-ubuntu-issue
-find_package(MLPACK REQUIRED)
-
+find_package(mlpack REQUIRED)
 target_include_directories(${PROJECT_NAME} PRIVATE ${MLPACK_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${MLPACK_LIBRARIES})
-message(STATUS "MLPACK_INCLUDE_DIRS: " ${MLPACK_INCLUDE_DIRS})
-message(STATUS "MLPACK_LIBRARY: " ${MLPACK_LIBRARIES})
+#message(STATUS "MLPACK_INCLUDE_DIRS: " ${MLPACK_INCLUDE_DIRS})
+#message(STATUS "MLPACK_LIBRARY: " ${MLPACK_LIBRARIES})
