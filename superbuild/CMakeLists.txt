@@ -137,12 +137,26 @@ ExternalProject_Add(mlpack
 )
 #set_property(TARGET mlpack PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>") - not working
 
+ExternalProject_Add(glfw
+    PREFIX                  ${LIBRARIES_PREFIX}/glfw
+    GIT_REPOSITORY          https://github.com/glfw/glfw.git
+    GIT_TAG                 3.3.4
+    CMAKE_ARGS              -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/glfw
+    CMAKE_CACHE_ARGS        -DGLFW_BUILD_DOCS:BOOL=OFF
+                            -DGLFW_BUILD_TESTS:BOOL=OFF
+                            -DGLFW_BUILD_EXAMPLES:BOOL=OFF
+                            
+    UPDATE_DISCONNECTED     TRUE
+    UPDATE_COMMAND          ""
+    BUILD_ALWAYS            FALSE
+)
+
 ExternalProject_Add(mvisus
     PREFIX              ${LIBRARIES_PREFIX}/mvisus
-    DEPENDS             mlpack
+    DEPENDS             mlpack glfw
     SOURCE_DIR          ${PROJECT_SOURCE_DIR}/../
     CMAKE_ARGS          -DBoost_USE_STATIC_RUNTIME:BOOL=OFF #-DLIBRARIES_INSTALL_PREFIX=${LIBRARIES_INSTALL_PREFIX} -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-    CMAKE_CACHE_ARGS    -DCMAKE_PREFIX_PATH:STRING="${LIBRARIES_INSTALL_PREFIX}/armadillo;${LIBRARIES_INSTALL_PREFIX}/mlpack;" -DBOOST_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/boost
+    CMAKE_CACHE_ARGS    -DCMAKE_PREFIX_PATH:STRING="${LIBRARIES_INSTALL_PREFIX}/armadillo;${LIBRARIES_INSTALL_PREFIX}/mlpack;" -DBOOST_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/boost -DGLFW3_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/glfw
     BUILD_ALWAYS        TRUE
     INSTALL_COMMAND     ""
 )
