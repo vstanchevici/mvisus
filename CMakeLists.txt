@@ -175,7 +175,28 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${GLFW3_LIBRARY})
 #message(STATUS "GLFW3_LIBRARY: ${GLFW3_LIBRARY}")
 
 if(IMGUI_PATH)
-    message(STATUS "IMGUI_PATH: ${IMGUI_PATH}")
+    #message(STATUS "IMGUI_PATH: ${IMGUI_PATH}")
+    set(IMGUI_SRC 
+            ${IMGUI_PATH}/imconfig.h
+            ${IMGUI_PATH}/imgui.cpp
+            ${IMGUI_PATH}/imgui.h
+            ${IMGUI_PATH}/imgui_demo.cpp
+            ${IMGUI_PATH}/imgui_draw.cpp
+            ${IMGUI_PATH}/imgui_internal.h
+            ${IMGUI_PATH}/imgui_tables.cpp
+            ${IMGUI_PATH}/imgui_widgets.cpp
+            ${IMGUI_PATH}/imstb_rectpack.h
+            ${IMGUI_PATH}/imstb_textedit.h
+            ${IMGUI_PATH}/imstb_truetype.h
+            ${IMGUI_PATH}/backends/imgui_impl_opengl3.cpp
+            ${IMGUI_PATH}/backends/imgui_impl_opengl3.h
+            ${IMGUI_PATH}/backends/imgui_impl_glfw.cpp
+            ${IMGUI_PATH}/backends/imgui_impl_glfw.h
+    )
+    
+    message(STATUS "IMGUI_SRC: ${IMGUI_SRC}")
+    target_sources(${PROJECT_NAME} PRIVATE ${IMGUI_SRC})
+    target_include_directories(${PROJECT_NAME} PRIVATE ${IMGUI_PATH})
 else()
     message(FATAL_ERROR "IMGUI_PATH is not set!")
 endif()
