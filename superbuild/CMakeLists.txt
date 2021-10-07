@@ -9,12 +9,6 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 #[[
-#https://discourse.cmake.org/t/how-to-set-cmake-msvc-runtime-library-for-an-external-project/2805/4
-#set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-#set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-#set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-
 #https://github.com/oneapi-src/oneTBB/blob/master/CMakeLists.txt
 if (POLICY CMP0091)
     # The NEW behavior for this policy is to not place MSVC runtime library flags in the default
@@ -24,6 +18,12 @@ if (POLICY CMP0091)
 elseif (DEFINED CMAKE_MSVC_RUNTIME_LIBRARY)
     message(FATAL_ERROR "CMAKE_MSVC_RUNTIME_LIBRARY was defined while policy CMP0091 is not available. Use CMake 3.15 or newer.")
 endif()
+
+#https://discourse.cmake.org/t/how-to-set-cmake-msvc-runtime-library-for-an-external-project/2805/4
+#set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+#set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 ]]
 
 #
@@ -45,6 +45,18 @@ if(CPU_COUNT EQUAL 0)
     set(CPU_COUNT 1)
 endif()
 math(EXPR CPU_COUNT "${CPU_COUNT} / 2 + 1")
+
+#https://stackoverflow.com/questions/44284275/passing-compiler-options-cmake
+#https://stackoverflow.com/questions/12021448/how-can-cmake-arguments-be-forwarded-to-externalproject
+option(MVISUS_MSVC_STATIC_RUNTIME "Link with static msvc runtime libraries" OFF) #not yet implemented
+
+
+if(MSVC)
+  add_definitions(-D_WIN32_WINNT=0x600 -D_SCL_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_WARNINGS -D_WINSOCK_DEPRECATED_NO_WARNINGS)
+endif()
+if (MINGW)
+  add_definitions(-D_WIN32_WINNT=0x600)
+endif()
 
 
 include(ExternalProject)
@@ -98,21 +110,10 @@ ExternalProject_Add(armadillo
 )
 
 
-ExternalProject_Add(cereal
-    PREFIX                  ${LIBRARIES_PREFIX}/cereal
-    DEPENDS                 boost
-    GIT_REPOSITORY          https://github.com/USCiLab/cereal.git
-    GIT_TAG                 v1.3.0
-    CMAKE_ARGS              -DCMAKE_DEBUG_POSTFIX=$<$<CONFIG:Debug>:d> -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/cereal -DCMAKE_PREFIX_PATH:PATH=${LIBRARIES_INSTALL_PREFIX}/boost -DJUST_INSTALL_CEREAL:BOOL=TRUE
-    UPDATE_DISCONNECTED     TRUE
-    UPDATE_COMMAND          ""
-    BUILD_ALWAYS            FALSE
-)
-
 #https://www.statwks.com/c/
 ExternalProject_Add(mlpack
     PREFIX                  ${LIBRARIES_PREFIX}/mlpack
-    DEPENDS                 cereal armadillo
+    DEPENDS                 armadillo #cereal
     GIT_REPOSITORY          https://github.com/mlpack/mlpack.git
     GIT_TAG                 3.4.2
     CMAKE_ARGS              -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/mlpack -DCMAKE_DEBUG_POSTFIX=$<$<CONFIG:Debug>:d>
