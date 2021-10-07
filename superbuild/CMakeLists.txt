@@ -105,7 +105,7 @@ ExternalProject_Add(armadillo
 #https://www.statwks.com/c/
 ExternalProject_Add(mlpack
     PREFIX                  ${LIBRARIES_PREFIX}/mlpack
-    DEPENDS                 armadillo #cereal
+    DEPENDS                 armadillo boost
     GIT_REPOSITORY          https://github.com/mlpack/mlpack.git
     GIT_TAG                 3.4.2
     CMAKE_ARGS              -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/mlpack -DCMAKE_DEBUG_POSTFIX=$<$<CONFIG:Debug>:d>
@@ -117,6 +117,7 @@ ExternalProject_Add(mlpack
                             -DBUILD_R_BINDINGS:BOOL=OFF
                             -DBUILD_CLI_EXECUTABLES:BOOL=OFF
                             -DBUILD_GO_BINDINGS:BOOL=OFF
+                            -DBUILD_JULIA_BINDINGS:BOOl=OFF
                             -DCMAKE_PREFIX_PATH:PATH=${LIBRARIES_INSTALL_PREFIX}/armadillo
                             -DBOOST_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/boost
                             -DBoost_DEBUG:BOOL=ON
