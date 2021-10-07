@@ -148,6 +148,14 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 endif()
 
+if(MSVC)
+    add_definitions(-D_WIN32_WINNT=0x600 -D_SCL_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_WARNINGS -D_WINSOCK_DEPRECATED_NO_WARNINGS)
+endif()
+if (MINGW)
+    add_definitions(-D_WIN32_WINNT=0x600)
+endif()
+
+
 find_package(Armadillo REQUIRED)
 target_include_directories(${PROJECT_NAME} PRIVATE ${ARMADILLO_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${ARMADILLO_LIBRARIES})

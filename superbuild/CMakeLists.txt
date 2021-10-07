@@ -51,14 +51,6 @@ math(EXPR CPU_COUNT "${CPU_COUNT} / 2 + 1")
 option(MVISUS_MSVC_STATIC_RUNTIME "Link with static msvc runtime libraries" OFF) #not yet implemented
 
 
-if(MSVC)
-  add_definitions(-D_WIN32_WINNT=0x600 -D_SCL_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_WARNINGS -D_WINSOCK_DEPRECATED_NO_WARNINGS)
-endif()
-if (MINGW)
-  add_definitions(-D_WIN32_WINNT=0x600)
-endif()
-
-
 include(ExternalProject)
 
 if(NOT DEFINED LIBRARIES_PREFIX)
