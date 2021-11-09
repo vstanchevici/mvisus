@@ -70,6 +70,12 @@ elseif (UNIX)
 endif()
 
 
+message(STATUS "CMAKE_AR: ${CMAKE_AR}")
+message(STATUS "CMAKE_ASM_COMPILER: ${CMAKE_ASM_COMPILER}")
+message(STATUS "CMAKE_LINKER: ${CMAKE_LINKER}")
+message(STATUS "CMAKE_OBJCOPY: ${CMAKE_OBJCOPY}")
+message(STATUS "CMAKE_RANLIB: ${CMAKE_RANLIB}")
+
 ExternalProject_Add(boost
     PREFIX                  ${LIBRARIES_PREFIX}/boost
     GIT_REPOSITORY          https://github.com/boostorg/boost.git
