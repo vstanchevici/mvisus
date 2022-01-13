@@ -1,4 +1,4 @@
-#
+ #
 # === CMake lists for the mvisus ===
 #
 
@@ -7,24 +7,6 @@
 
 # Set CMake version
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
-
-#[[
-#https://github.com/oneapi-src/oneTBB/blob/master/CMakeLists.txt
-if (POLICY CMP0091)
-    # The NEW behavior for this policy is to not place MSVC runtime library flags in the default
-    # CMAKE_<LANG>_FLAGS_<CONFIG> cache entries and use CMAKE_MSVC_RUNTIME_LIBRARY abstraction instead.
-    cmake_policy(SET CMP0091 NEW)
-    message(STATUS "CMAKE_MSVC_RUNTIME_LIBRARY -> ${CMAKE_MSVC_RUNTIME_LIBRARY}")
-elseif (DEFINED CMAKE_MSVC_RUNTIME_LIBRARY)
-    message(FATAL_ERROR "CMAKE_MSVC_RUNTIME_LIBRARY was defined while policy CMP0091 is not available. Use CMake 3.15 or newer.")
-endif()
-
-#https://discourse.cmake.org/t/how-to-set-cmake-msvc-runtime-library-for-an-external-project/2805/4
-#set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-#set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-#set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-]]
 
 #
 # Configure CMake environment
@@ -69,13 +51,6 @@ elseif (UNIX)
     set(EXE_EXTENSION "")
 endif()
 
-
-message(STATUS "CMAKE_AR: ${CMAKE_AR}")
-message(STATUS "CMAKE_ASM_COMPILER: ${CMAKE_ASM_COMPILER}")
-message(STATUS "CMAKE_LINKER: ${CMAKE_LINKER}")
-message(STATUS "CMAKE_OBJCOPY: ${CMAKE_OBJCOPY}")
-message(STATUS "CMAKE_RANLIB: ${CMAKE_RANLIB}")
-
 ExternalProject_Add(boost
     PREFIX                  ${LIBRARIES_PREFIX}/boost
     GIT_REPOSITORY          https://github.com/boostorg/boost.git
@@ -96,7 +71,7 @@ ExternalProject_Add(boost
 ExternalProject_Add(armadillo
     PREFIX                  ${LIBRARIES_PREFIX}/armadillo
     GIT_REPOSITORY          https://gitlab.com/conradsnicta/armadillo-code.git
-    GIT_TAG                 10.7.x
+    GIT_TAG                 10.8.x
     CMAKE_ARGS              -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/armadillo #-DCMAKE_DEBUG_POSTFIX=$<$<CONFIG:Debug>:d>  they dont support this now
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
@@ -108,6 +83,8 @@ ExternalProject_Add(armadillo
 )
 
 
+#5>-- Could NOT find Ensmallen (missing: ENSMALLEN_INCLUDE_DIR) (Required is at least version "2.10.0")
+#5>-- Could NOT find StbImage (missing: STB_IMAGE_INCLUDE_DIR)
 #https://www.statwks.com/c/
 ExternalProject_Add(mlpack
     PREFIX                  ${LIBRARIES_PREFIX}/mlpack
@@ -123,19 +100,18 @@ ExternalProject_Add(mlpack
                             -DBUILD_R_BINDINGS:BOOL=OFF
                             -DBUILD_CLI_EXECUTABLES:BOOL=OFF
                             -DBUILD_GO_BINDINGS:BOOL=OFF
-                            -DBUILD_JULIA_BINDINGS:BOOl=OFF
+                            -DBUILD_JULIA_BINDINGS:BOOL=OFF
                             -DCMAKE_PREFIX_PATH:PATH=${LIBRARIES_INSTALL_PREFIX}/armadillo
                             -DBOOST_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/boost
-                            -DBoost_DEBUG:BOOL=ON
                             -DBoost_USE_STATIC_RUNTIME:BOOL=OFF
                             -DBoost_LIB_PREFIX:STRING=lib
+                            #-DBoost_DEBUG:BOOL=ON
                             #-DBoost_NO_BOOST_CMAKE:BOOL=FALSE
 
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
     BUILD_ALWAYS            FALSE
 )
-#set_property(TARGET mlpack PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>") - not working
 
 ExternalProject_Add(glfw
     PREFIX                  ${LIBRARIES_PREFIX}/glfw
@@ -165,15 +141,33 @@ ExternalProject_Add(imgui
 ExternalProject_Get_property(imgui SOURCE_DIR)
 set(IMGUI_SOURCE_DIR ${SOURCE_DIR})
 
+ExternalProject_Add(glm
+    PREFIX                  ${LIBRARIES_PREFIX}/glm
+    GIT_REPOSITORY          https://github.com/g-truc/glm.git
+    GIT_TAG                 master
+    CMAKE_ARGS              -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/glm
+    CMAKE_CACHE_ARGS        -DBUILD_TESTING:BOOL=OFF
+                            -DBUILD_SHARED_LIBS:BOOL=OFF
+                            -DBUILD_STATIC_LIBS:BOOL=ON
+
+    UPDATE_DISCONNECTED     TRUE
+    UPDATE_COMMAND          ""
+    BUILD_ALWAYS            FALSE
+)
+
 ExternalProject_Add(mvisus
     PREFIX              ${LIBRARIES_PREFIX}/mvisus
-    DEPENDS             mlpack imgui
+    DEPENDS             mlpack imgui glm
     SOURCE_DIR          ${PROJECT_SOURCE_DIR}/../
-    CMAKE_ARGS          -DBoost_USE_STATIC_RUNTIME:BOOL=OFF #-DLIBRARIES_INSTALL_PREFIX=${LIBRARIES_INSTALL_PREFIX} -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-    CMAKE_CACHE_ARGS    -DCMAKE_PREFIX_PATH:STRING="${LIBRARIES_INSTALL_PREFIX}/armadillo;${LIBRARIES_INSTALL_PREFIX}/mlpack;"
+    CMAKE_CACHE_ARGS    #-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+                        -DCMAKE_PREFIX_PATH:STRING= ${LIBRARIES_INSTALL_PREFIX}/armadillo
+                                                    ${LIBRARIES_INSTALL_PREFIX}/mlpack
+                                                    ${LIBRARIES_INSTALL_PREFIX}/glm
                         -DBOOST_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/boost
+                        -DBoost_USE_STATIC_RUNTIME:BOOL=OFF
                         -DGLFW3_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/glfw
                         -DIMGUI_PATH:PATH=${IMGUI_SOURCE_DIR}
+
     BUILD_ALWAYS        TRUE
     INSTALL_COMMAND     ""
 )

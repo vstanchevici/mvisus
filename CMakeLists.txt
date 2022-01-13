@@ -183,7 +183,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${GLFW3_LIBRARY})
 #message(STATUS "GLFW3_LIBRARY: ${GLFW3_LIBRARY}")
 
 if(IMGUI_PATH)
-    #message(STATUS "IMGUI_PATH: ${IMGUI_PATH}")
     set(IMGUI_SRC 
             ${IMGUI_PATH}/imconfig.h
             ${IMGUI_PATH}/imgui.cpp
@@ -202,9 +201,19 @@ if(IMGUI_PATH)
             ${IMGUI_PATH}/backends/imgui_impl_glfw.h
     )
     
-    message(STATUS "IMGUI_SRC: ${IMGUI_SRC}")
+    foreach(_source IN ITEMS ${IMGUI_SRC})
+        get_filename_component(_source_path "${_source}" PATH)
+        file(RELATIVE_PATH _source_path_rel "${IMGUI_PATH}" "${_source_path}")
+        string(REPLACE "/" "\\" _group_path "${_source_path_rel}")
+        source_group("source\\imgui\\${_group_path}" FILES "${_source}")
+    endforeach()
+
     target_sources(${PROJECT_NAME} PRIVATE ${IMGUI_SRC})
     target_include_directories(${PROJECT_NAME} PRIVATE ${IMGUI_PATH})
 else()
     message(FATAL_ERROR "IMGUI_PATH is not set!")
 endif()
+
+
+find_package(glm REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
