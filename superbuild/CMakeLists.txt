@@ -54,7 +54,7 @@ endif()
 ExternalProject_Add(boost
     PREFIX                  ${LIBRARIES_PREFIX}/boost
     GIT_REPOSITORY          https://github.com/boostorg/boost.git
-    GIT_TAG                 boost-1.74.0
+    GIT_TAG                 boost-1.78.0
     GIT_SHALLOW             1
     GIT_SUBMODULES_RECURSE  1
     BUILD_IN_SOURCE         ON
@@ -106,11 +106,16 @@ ExternalProject_Add(mlpack
                             -DBoost_USE_STATIC_RUNTIME:BOOL=OFF
                             -DBoost_LIB_PREFIX:STRING=lib
                             #-DBoost_DEBUG:BOOL=ON
-                            #-DBoost_NO_BOOST_CMAKE:BOOL=FALSE
+                            -DBoost_NO_BOOST_CMAKE:BOOL=FALSE
 
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
     BUILD_ALWAYS            FALSE
+)
+ExternalProject_Add_Step(mlpack replace_cmakelists
+    DEPENDEES download
+    DEPENDERS configure
+    COMMAND cp ${PROJECT_SOURCE_DIR}/patch/mlpack.3.4.2/CMakeLists.txt  ${LIBRARIES_PREFIX}/mlpack/src/mlpack/CMakeLists.txt
 )
 
 ExternalProject_Add(glfw
