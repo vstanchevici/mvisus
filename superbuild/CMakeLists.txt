@@ -30,8 +30,9 @@ math(EXPR CPU_COUNT "${CPU_COUNT} / 2 + 1")
 
 #https://stackoverflow.com/questions/44284275/passing-compiler-options-cmake
 #https://stackoverflow.com/questions/12021448/how-can-cmake-arguments-be-forwarded-to-externalproject
-option(MVISUS_MSVC_STATIC_RUNTIME "Link with static msvc runtime libraries" OFF) #not yet implemented
+option(MVISUS_MSVC_STATIC_RUNTIME "Link with static msvc runtime libraries" ON)
 
+message(STATUS "MVISUS_MSVC_STATIC_RUNTIME: ${MVISUS_MSVC_STATIC_RUNTIME}")
 
 include(ExternalProject)
 
@@ -59,7 +60,7 @@ ExternalProject_Add(boost
     GIT_SUBMODULES_RECURSE  1
     BUILD_IN_SOURCE         ON
     CONFIGURE_COMMAND       ./bootstrap${SHELL_EXTENSION}
-    BUILD_COMMAND           ./b2${EXE_EXTENSION} link=static variant=$<IF:$<CONFIG:Debug>,debug,release> threading=multi runtime-link=shared address-model=64 --without-python -j ${CPU_COUNT} install --prefix=${LIBRARIES_INSTALL_PREFIX}/boost
+    BUILD_COMMAND           ./b2${EXE_EXTENSION} link=static variant=$<IF:$<CONFIG:Debug>,debug,release> threading=multi runtime-link=$<IF:$<BOOL:${MVISUS_MSVC_STATIC_RUNTIME}>,static,shared> address-model=64 --without-python -j ${CPU_COUNT} install --prefix=${LIBRARIES_INSTALL_PREFIX}/boost
     
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
@@ -103,10 +104,12 @@ ExternalProject_Add(mlpack
                             -DBUILD_JULIA_BINDINGS:BOOL=OFF
                             -DCMAKE_PREFIX_PATH:PATH=${LIBRARIES_INSTALL_PREFIX}/armadillo
                             -DBOOST_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/boost
-                            -DBoost_USE_STATIC_RUNTIME:BOOL=OFF
+                            -DBoost_USE_STATIC_RUNTIME:BOOL=${MVISUS_MSVC_STATIC_RUNTIME}
+                            -DBoost_USE_STATIC_LIBS:BOOL=ON
                             -DBoost_LIB_PREFIX:STRING=lib
-                            #-DBoost_DEBUG:BOOL=ON
                             -DBoost_NO_BOOST_CMAKE:BOOL=FALSE
+                            #-DBoost_DEBUG:BOOL=ON
+                            -DMVISUS_MSVC_STATIC_RUNTIME:BOOL=${MVISUS_MSVC_STATIC_RUNTIME}
 
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
@@ -115,7 +118,8 @@ ExternalProject_Add(mlpack
 ExternalProject_Add_Step(mlpack replace_cmakelists
     DEPENDEES download
     DEPENDERS configure
-    COMMAND cp ${PROJECT_SOURCE_DIR}/patch/mlpack.3.4.2/CMakeLists.txt  ${LIBRARIES_PREFIX}/mlpack/src/mlpack/CMakeLists.txt
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/patch/mlpack.3.4.2/CMakeLists.txt  ${LIBRARIES_PREFIX}/mlpack/src/mlpack/CMakeLists.txt
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/patch/mlpack.3.4.2/src/mlpack/CMakeLists.txt  ${LIBRARIES_PREFIX}/mlpack/src/mlpack/src/mlpack/CMakeLists.txt
 )
 
 ExternalProject_Add(glfw
@@ -126,7 +130,8 @@ ExternalProject_Add(glfw
     CMAKE_CACHE_ARGS        -DGLFW_BUILD_DOCS:BOOL=OFF
                             -DGLFW_BUILD_TESTS:BOOL=OFF
                             -DGLFW_BUILD_EXAMPLES:BOOL=OFF
-                            
+                            -DUSE_MSVC_RUNTIME_LIBRARY_DLL:BOOL=$<IF:$<BOOL:${MVISUS_MSVC_STATIC_RUNTIME}>,OFF,ON>
+
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
     BUILD_ALWAYS            FALSE
@@ -165,11 +170,13 @@ ExternalProject_Add(mvisus
     DEPENDS             mlpack imgui glm
     SOURCE_DIR          ${PROJECT_SOURCE_DIR}/../
     CMAKE_CACHE_ARGS    #-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+                        -DMVISUS_MSVC_STATIC_RUNTIME:BOOL=${MVISUS_MSVC_STATIC_RUNTIME}
                         -DCMAKE_PREFIX_PATH:STRING= ${LIBRARIES_INSTALL_PREFIX}/armadillo
                                                     ${LIBRARIES_INSTALL_PREFIX}/mlpack
                                                     ${LIBRARIES_INSTALL_PREFIX}/glm
                         -DBOOST_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/boost
-                        -DBoost_USE_STATIC_RUNTIME:BOOL=OFF
+                        -DBoost_USE_STATIC_RUNTIME:BOOL=${MVISUS_MSVC_STATIC_RUNTIME}
+                        -DBoost_USE_STATIC_LIBS:BOOL=ON
                         -DGLFW3_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/glfw
                         -DIMGUI_PATH:PATH=${IMGUI_SOURCE_DIR}
 
