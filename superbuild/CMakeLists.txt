@@ -52,6 +52,7 @@ elseif (UNIX)
     set(EXE_EXTENSION "")
 endif()
 
+#[[
 ExternalProject_Add(boost
     PREFIX                  ${LIBRARIES_PREFIX}/boost
     GIT_REPOSITORY          https://github.com/boostorg/boost.git
@@ -66,6 +67,22 @@ ExternalProject_Add(boost
     UPDATE_COMMAND          ""
     BUILD_ALWAYS            FALSE
     INSTALL_COMMAND         ""
+)
+]]
+
+ExternalProject_Add(boost
+    PREFIX                  ${LIBRARIES_PREFIX}/boost
+    GIT_REPOSITORY          https://github.com/boostorg/boost.git
+    GIT_TAG                 boost-1.78.0
+    GIT_SHALLOW             1
+    GIT_SUBMODULES_RECURSE  1
+    CMAKE_ARGS              -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/boost
+    CMAKE_CACHE_ARGS        -DBOOST_RUNTIME_LINK:STRING=$<IF:$<BOOL:${MVISUS_MSVC_STATIC_RUNTIME}>,static,shared>
+                            -DBUILD_SHARED_LIBS:BOOL=OFF
+
+    UPDATE_DISCONNECTED     TRUE
+    UPDATE_COMMAND          ""
+    BUILD_ALWAYS            FALSE
 )
 
 
