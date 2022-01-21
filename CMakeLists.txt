@@ -146,10 +146,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE  ${INCLUDE_ROOT_PATH} ${SRC_R
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     if (MVISUS_MSVC_STATIC_RUNTIME)
         set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-        message(STATUS "MSVC STATIC")
     else()
         set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-        message(STATUS "MSVC SHARED")
     endif()
 endif()
 

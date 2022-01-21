@@ -100,13 +100,24 @@ ExternalProject_Add(armadillo
     #TEST_COMMAND           ""
 )
 
+ExternalProject_Add(stb
+    PREFIX                  ${LIBRARIES_PREFIX}/stb
+    GIT_REPOSITORY          https://github.com/nothings/stb.git
+    UPDATE_DISCONNECTED     TRUE
+    UPDATE_COMMAND          ""
+    CONFIGURE_COMMAND       ""
+    BUILD_COMMAND           ""
+    INSTALL_COMMAND         ""
+)
+ExternalProject_Get_property(stb SOURCE_DIR)
+set(STB_SOURCE_DIR ${SOURCE_DIR})
 
 #5>-- Could NOT find Ensmallen (missing: ENSMALLEN_INCLUDE_DIR) (Required is at least version "2.10.0")
 #5>-- Could NOT find StbImage (missing: STB_IMAGE_INCLUDE_DIR)
 #https://www.statwks.com/c/
 ExternalProject_Add(mlpack
     PREFIX                  ${LIBRARIES_PREFIX}/mlpack
-    DEPENDS                 armadillo boost
+    DEPENDS                 armadillo boost stb
     GIT_REPOSITORY          https://github.com/mlpack/mlpack.git
     GIT_TAG                 3.4.2
     CMAKE_ARGS              -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/mlpack -DCMAKE_DEBUG_POSTFIX=$<$<CONFIG:Debug>:d>
@@ -114,12 +125,14 @@ ExternalProject_Add(mlpack
     CMAKE_CACHE_ARGS        -DBUILD_TESTS:BOOL=OFF
                             -DBUILD_SHARED_LIBS:BOOL=OFF
                             -DDOWNLOAD_ENSMALLEN:BOOL=ON
-                            -DDOWNLOAD_STB_IMAGE:BOOL=ON
+                            -DDOWNLOAD_STB_IMAGE:BOOL=OFF
                             -DBUILD_R_BINDINGS:BOOL=OFF
                             -DBUILD_CLI_EXECUTABLES:BOOL=OFF
                             -DBUILD_GO_BINDINGS:BOOL=OFF
                             -DBUILD_JULIA_BINDINGS:BOOL=OFF
                             -DCMAKE_PREFIX_PATH:PATH=${LIBRARIES_INSTALL_PREFIX}/armadillo
+                            -DSTB_IMAGE_FOUND:BOOL=TRUE
+                            -DSTB_IMAGE_INCLUDE_DIR:STRING=${STB_SOURCE_DIR}
                             -DBOOST_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/boost
                             -DBoost_USE_STATIC_RUNTIME:BOOL=${MVISUS_MSVC_STATIC_RUNTIME}
                             -DBoost_USE_STATIC_LIBS:BOOL=ON
@@ -196,6 +209,7 @@ ExternalProject_Add(mvisus
                         -DBoost_USE_STATIC_LIBS:BOOL=ON
                         -DGLFW3_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/glfw
                         -DIMGUI_PATH:PATH=${IMGUI_SOURCE_DIR}
+                        -DSTB_SOURCE_DIR:PATH=${STB_SOURCE_DIR}
 
     BUILD_ALWAYS        TRUE
     INSTALL_COMMAND     ""
