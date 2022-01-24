@@ -22,7 +22,7 @@ endforeach()
 add_library(mlpack ${MLPACK_SRCS})
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    if (MVISUS_MSVC_STATIC_RUNTIME)
+    if (MLPACK_MSVC_STATIC_RUNTIME)
         set_property(TARGET mlpack PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     else()
         set_property(TARGET mlpack PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")

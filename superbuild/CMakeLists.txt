@@ -8,6 +8,20 @@
 # Set CMake version
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
+# Set paths
+if(NOT DEFINED LIBRARIES_PREFIX)
+    set(LIBRARIES_PREFIX ${CMAKE_BINARY_DIR})
+endif()
+
+if(NOT DEFINED LIBRARIES_INSTALL_PREFIX)
+    set(LIBRARIES_INSTALL_PREFIX ${LIBRARIES_PREFIX}/install/${CMAKE_SYSTEM_NAME})
+endif()
+
+# If is not set CMAKE_INSTALL_PREFIX set it
+if(NOT CMAKE_INSTALL_PREFIX)
+  set(CMAKE_INSTALL_PREFIX ${LIBRARIES_INSTALL_PREFIX} CACHE STRING "Install location for mvisus." FORCE)
+endif()
+
 #
 # Configure CMake environment
 #
@@ -28,21 +42,9 @@ if(CPU_COUNT EQUAL 0)
 endif()
 math(EXPR CPU_COUNT "${CPU_COUNT} / 2 + 1")
 
-#https://stackoverflow.com/questions/44284275/passing-compiler-options-cmake
-#https://stackoverflow.com/questions/12021448/how-can-cmake-arguments-be-forwarded-to-externalproject
 option(MVISUS_MSVC_STATIC_RUNTIME "Link with static msvc runtime libraries" ON)
 
 message(STATUS "MVISUS_MSVC_STATIC_RUNTIME: ${MVISUS_MSVC_STATIC_RUNTIME}")
-
-include(ExternalProject)
-
-if(NOT DEFINED LIBRARIES_PREFIX)
-    set(LIBRARIES_PREFIX ${CMAKE_BINARY_DIR})
-endif()
-
-if(NOT DEFINED LIBRARIES_INSTALL_PREFIX)
-    set(LIBRARIES_INSTALL_PREFIX ${LIBRARIES_PREFIX}/installed/${CMAKE_SYSTEM_NAME})
-endif()
 
 if (WIN32)
     set(SHELL_EXTENSION ".bat")
@@ -51,6 +53,8 @@ elseif (UNIX)
     set(SHELL_EXTENSION ".sh")
     set(EXE_EXTENSION "")
 endif()
+
+include(ExternalProject)
 
 #[[
 ExternalProject_Add(boost
@@ -138,8 +142,9 @@ ExternalProject_Add(mlpack
                             -DBoost_USE_STATIC_LIBS:BOOL=ON
                             -DBoost_LIB_PREFIX:STRING=lib
                             -DBoost_NO_BOOST_CMAKE:BOOL=FALSE
+                            -DBoost_ADDITIONAL_VERSIONS:STRING="1.78"
                             #-DBoost_DEBUG:BOOL=ON
-                            -DMVISUS_MSVC_STATIC_RUNTIME:BOOL=${MVISUS_MSVC_STATIC_RUNTIME}
+                            -DMLPACK_MSVC_STATIC_RUNTIME:BOOL=${MVISUS_MSVC_STATIC_RUNTIME}
 
     UPDATE_DISCONNECTED     TRUE
     UPDATE_COMMAND          ""
@@ -207,6 +212,7 @@ ExternalProject_Add(mvisus
                         -DBOOST_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/boost
                         -DBoost_USE_STATIC_RUNTIME:BOOL=${MVISUS_MSVC_STATIC_RUNTIME}
                         -DBoost_USE_STATIC_LIBS:BOOL=ON
+                        -DBoost_ADDITIONAL_VERSIONS:STRING="1.78"
                         -DGLFW3_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/glfw
                         -DIMGUI_PATH:PATH=${IMGUI_SOURCE_DIR}
                         -DSTB_SOURCE_DIR:PATH=${STB_SOURCE_DIR}
