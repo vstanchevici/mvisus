@@ -185,6 +185,18 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${GLFW3_LIBRARY})
 #message(STATUS "GLFW3_INCLUDE_DIR: ${GLFW3_INCLUDE_DIR}")
 #message(STATUS "GLFW3_LIBRARY: ${GLFW3_LIBRARY}")
 
+find_package(glm REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
+
+message(STATUS "ARCL_PATH: ${ARCL_PATH}")
+
+if(ARCL_PATH)
+    add_subdirectory(${ARCL_PATH} ${CMAKE_BINARY_DIR}/arcl)
+    set_property(DIRECTORY ${ARCL_PATH} APPEND PROPERTY COMPILE_DEFINITIONS "-DBUILD_TESTS=FALSE")
+else()
+    message(FATAL_ERROR "ARCL_PATH is not set!")
+endif()
+
 if(IMGUI_PATH)
     set(IMGUI_SRC 
             ${IMGUI_PATH}/imconfig.h
@@ -216,7 +228,3 @@ if(IMGUI_PATH)
 else()
     message(FATAL_ERROR "IMGUI_PATH is not set!")
 endif()
-
-
-find_package(glm REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)

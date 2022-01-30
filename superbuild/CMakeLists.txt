@@ -172,20 +172,6 @@ ExternalProject_Add(glfw
     BUILD_ALWAYS            FALSE
 )
 
-ExternalProject_Add(imgui
-    PREFIX                  ${LIBRARIES_PREFIX}/imgui
-    DEPENDS                 glfw
-    GIT_REPOSITORY          https://github.com/ocornut/imgui.git
-    GIT_TAG                 v1.84.2
-    UPDATE_DISCONNECTED     TRUE
-    UPDATE_COMMAND          ""
-    CONFIGURE_COMMAND       ""
-    BUILD_COMMAND           ""
-    INSTALL_COMMAND         ""
-)
-ExternalProject_Get_property(imgui SOURCE_DIR)
-set(IMGUI_SOURCE_DIR ${SOURCE_DIR})
-
 ExternalProject_Add(glm
     PREFIX                  ${LIBRARIES_PREFIX}/glm
     GIT_REPOSITORY          https://github.com/g-truc/glm.git
@@ -200,9 +186,36 @@ ExternalProject_Add(glm
     BUILD_ALWAYS            FALSE
 )
 
+
+ExternalProject_Add(imgui
+    PREFIX                  ${LIBRARIES_PREFIX}/imgui
+    DEPENDS                 glfw
+    GIT_REPOSITORY          https://github.com/ocornut/imgui.git
+    GIT_TAG                 v1.84.2
+    UPDATE_DISCONNECTED     TRUE
+    UPDATE_COMMAND          ""
+    CONFIGURE_COMMAND       ""
+    BUILD_COMMAND           ""
+    INSTALL_COMMAND         ""
+)
+ExternalProject_Get_property(imgui SOURCE_DIR)
+set(IMGUI_SOURCE_DIR ${SOURCE_DIR})
+
+ExternalProject_Add(arcl
+    PREFIX                  ${LIBRARIES_PREFIX}/arcl
+    SOURCE_DIR              ${PROJECT_SOURCE_DIR}/../../arcl
+    UPDATE_DISCONNECTED     TRUE
+    UPDATE_COMMAND          ""
+    CONFIGURE_COMMAND       ""
+    BUILD_COMMAND           ""
+    INSTALL_COMMAND         ""
+)
+ExternalProject_Get_property(arcl SOURCE_DIR)
+set(ARCL_PATH ${SOURCE_DIR})
+
 ExternalProject_Add(mvisus
     PREFIX              ${LIBRARIES_PREFIX}/mvisus
-    DEPENDS             mlpack imgui glm
+    DEPENDS             mlpack imgui glm arcl
     SOURCE_DIR          ${PROJECT_SOURCE_DIR}/../
     CMAKE_CACHE_ARGS    #-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
                         -DMVISUS_MSVC_STATIC_RUNTIME:BOOL=${MVISUS_MSVC_STATIC_RUNTIME}
@@ -216,6 +229,7 @@ ExternalProject_Add(mvisus
                         -DGLFW3_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/glfw
                         -DIMGUI_PATH:PATH=${IMGUI_SOURCE_DIR}
                         -DSTB_SOURCE_DIR:PATH=${STB_SOURCE_DIR}
+                        -DARCL_PATH:PATH=${ARCL_PATH}
 
     BUILD_ALWAYS        TRUE
     INSTALL_COMMAND     ""
