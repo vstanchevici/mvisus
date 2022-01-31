@@ -178,17 +178,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${MLPACK_LIBRARIES})
 #message(STATUS "MLPACK_INCLUDE_DIRS: " ${MLPACK_INCLUDE_DIRS})
 #message(STATUS "MLPACK_LIBRARY: " ${MLPACK_LIBRARIES})
 
-
-find_package(GLFW3 REQUIRED)
-target_include_directories(${PROJECT_NAME} PRIVATE ${GLFW3_INCLUDE_DIR})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${GLFW3_LIBRARY})
-#message(STATUS "GLFW3_INCLUDE_DIR: ${GLFW3_INCLUDE_DIR}")
-#message(STATUS "GLFW3_LIBRARY: ${GLFW3_LIBRARY}")
-
 find_package(glm REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
-
-message(STATUS "ARCL_PATH: ${ARCL_PATH}")
 
 if(ARCL_PATH)
     add_subdirectory(${ARCL_PATH} ${CMAKE_BINARY_DIR}/arcl)
@@ -210,12 +201,25 @@ if(IMGUI_PATH)
             ${IMGUI_PATH}/imstb_rectpack.h
             ${IMGUI_PATH}/imstb_textedit.h
             ${IMGUI_PATH}/imstb_truetype.h
-            ${IMGUI_PATH}/backends/imgui_impl_opengl3.cpp
-            ${IMGUI_PATH}/backends/imgui_impl_opengl3.h
-            ${IMGUI_PATH}/backends/imgui_impl_glfw.cpp
-            ${IMGUI_PATH}/backends/imgui_impl_glfw.h
     )
     
+    # The naming scheme: mymap_<val>
+    set(mymap_val1 key1) # Maps val1 => key1
+    set(mymap_val2 key2) # Maps val2 => key2
+    # ...
+    set(avar val1) # Some key
+    message("Key ${avar} is mapped into: ${mymap_${avar}}")
+
+    set(IMGUI_SRC ${IMGUI_SRC}
+            ${IMGUI_PATH}/backends/imgui_impl_dx12.h
+            ${IMGUI_PATH}/backends/imgui_impl_dx12.cpp
+    )
+
+    set(IMGUI_SRC ${IMGUI_SRC}
+            ${IMGUI_PATH}/backends/imgui_impl_win32.h
+            ${IMGUI_PATH}/backends/imgui_impl_win32.cpp
+    )
+
     foreach(_source IN ITEMS ${IMGUI_SRC})
         get_filename_component(_source_path "${_source}" PATH)
         file(RELATIVE_PATH _source_path_rel "${IMGUI_PATH}" "${_source_path}")
