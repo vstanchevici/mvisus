@@ -196,19 +196,47 @@ ExternalProject_Add(arcl
 ExternalProject_Get_property(arcl SOURCE_DIR)
 set(ARCL_PATH ${SOURCE_DIR})
 
+ExternalProject_Add(json
+    PREFIX                  ${LIBRARIES_PREFIX}/json
+    GIT_REPOSITORY          https://github.com/nlohmann/json.git
+    GIT_TAG                 v3.10.5
+    GIT_SHALLOW             1    
+    UPDATE_DISCONNECTED     TRUE
+    UPDATE_COMMAND          ""
+    BUILD_ALWAYS            FALSE
+    CMAKE_ARGS              -DCMAKE_INSTALL_PREFIX=${LIBRARIES_INSTALL_PREFIX}/json
+                            -DJSON_BuildTests=OFF
+                            -DJSON_Install=ON
+)
+
+ExternalProject_Add(argparse
+    PREFIX                  ${LIBRARIES_PREFIX}/argparse
+    GIT_REPOSITORY          https://github.com/p-ranav/argparse.git
+    GIT_TAG                 v2.2                               
+    UPDATE_DISCONNECTED     TRUE
+    UPDATE_COMMAND          ""
+    BUILD_ALWAYS            FALSE
+    CMAKE_ARGS              -DCMAKE_INSTALL_PREFIX:PATH=${LIBRARIES_INSTALL_PREFIX}/argparse
+                            -DARGPARSE_BUILD_TESTS:BOOL=OFF
+                            -DARGPARSE_LONG_VERSION_ARG_ONLY:BOOL=OFF
+)
+
 ExternalProject_Add(mvisus
     PREFIX              ${LIBRARIES_PREFIX}/mvisus
-    DEPENDS             mlpack imgui glm arcl
+    DEPENDS             mlpack imgui glm arcl json
     SOURCE_DIR          ${PROJECT_SOURCE_DIR}/../
     CMAKE_CACHE_ARGS    #-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
                         -DMVISUS_MSVC_STATIC_RUNTIME:BOOL=${MVISUS_MSVC_STATIC_RUNTIME}
                         -DCMAKE_PREFIX_PATH:STRING= ${LIBRARIES_INSTALL_PREFIX}/armadillo
                                                     ${LIBRARIES_INSTALL_PREFIX}/mlpack
                                                     ${LIBRARIES_INSTALL_PREFIX}/glm
+                                                    ${LIBRARIES_INSTALL_PREFIX}/json
+                                                    ${LIBRARIES_INSTALL_PREFIX}/argparse
                         -DBOOST_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/boost
                         -DBoost_USE_STATIC_RUNTIME:BOOL=${MVISUS_MSVC_STATIC_RUNTIME}
                         -DBoost_USE_STATIC_LIBS:BOOL=ON
                         -DBoost_ADDITIONAL_VERSIONS:STRING="1.78"
+                        -DBoost_NO_WARN_NEW_VERSIONS:BOOL=ON
                         -DIMGUI_PATH:PATH=${IMGUI_SOURCE_DIR}
                         -DSTB_SOURCE_DIR:PATH=${STB_SOURCE_DIR}
                         -DARCL_PATH:PATH=${ARCL_PATH}

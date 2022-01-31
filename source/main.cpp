@@ -1,9 +1,12 @@
-#include <mvisus-version.h>
-#include <iostream>
+#include "Application.h"
 
-int main(int argc, char* argv[])
+int main(int argc, char** argv)
 {
-    std::cout << "Project Name: " << MVISUS_PROJECT_NAME << std::endl;
-    std::cout << "Project Description: " << MVISUS_PROJECT_DESCRIPTION << std::endl;
+    mvisus::Application::Config config;
+    if (config.Load(argc, argv))
+    {
+        mvisus::Application app;
+        app.Run(config);
+    }
     return 0;
 }

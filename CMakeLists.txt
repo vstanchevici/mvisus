@@ -29,13 +29,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(GenerateExportHeader)
 
-set(WriterCompilerDetectionHeaderFound NOTFOUND)
-# This module is only available with CMake >=3.1, so check whether it could be found
-# BUT in CMake 3.1 this module doesn't recognize AppleClang as compiler, so just use it as of CMake 3.2
-if (${CMAKE_VERSION} VERSION_GREATER "3.2")
-    include(WriteCompilerDetectionHeader OPTIONAL RESULT_VARIABLE WriterCompilerDetectionHeaderFound)
-endif()
-
 # Include custom cmake modules
 include(cmake/GenerateTemplateExportHeader.cmake)
 include(cmake/GetGitRevisionDescription.cmake)
@@ -208,7 +201,7 @@ if(IMGUI_PATH)
     set(mymap_val2 key2) # Maps val2 => key2
     # ...
     set(avar val1) # Some key
-    message("Key ${avar} is mapped into: ${mymap_${avar}}")
+    #message("Key ${avar} is mapped into: ${mymap_${avar}}")
 
     set(IMGUI_SRC ${IMGUI_SRC}
             ${IMGUI_PATH}/backends/imgui_impl_dx12.h
@@ -232,3 +225,10 @@ if(IMGUI_PATH)
 else()
     message(FATAL_ERROR "IMGUI_PATH is not set!")
 endif()
+
+
+find_package(nlohmann_json REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
+
+find_package(argparse REQUIRED)
+target_link_libraries(${PROJECT_NAME} PUBLIC argparse::argparse)
