@@ -12,6 +12,7 @@
 #include <memory>
 #include <vector>
 #include <nlohmann/json.hpp>
+#include <argparse/argparse.hpp>
 
 namespace mvisus
 {
@@ -41,14 +42,16 @@ namespace mvisus
             class Config
             {
                 public:
-                    Config() {};
-                    ~Config() {};
+                    Config();
+                    ~Config(){};
                     bool Load(int argc, char** argv);
 
-
+                private:
+                    bool Validate();
 
                 private:
-                    nlohmann::json mConfig;
+                    nlohmann::json mConfigVariables, mConfigValues;
+                    argparse::ArgumentParser mProgram;
 
             };
 

@@ -142,7 +142,8 @@ ExternalProject_Add(mlpack
                             -DBoost_USE_STATIC_LIBS:BOOL=ON
                             -DBoost_LIB_PREFIX:STRING=lib
                             -DBoost_NO_BOOST_CMAKE:BOOL=FALSE
-                            -DBoost_ADDITIONAL_VERSIONS:STRING="1.78"
+                            -DBoost_ADDITIONAL_VERSIONS:STRING=1.78
+                            -DBoost_NO_WARN_NEW_VERSIONS:BOOL=ON
                             #-DBoost_DEBUG:BOOL=ON
                             -DMLPACK_MSVC_STATIC_RUNTIME:BOOL=${MVISUS_MSVC_STATIC_RUNTIME}
 
