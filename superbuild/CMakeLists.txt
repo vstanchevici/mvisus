@@ -235,7 +235,7 @@ ExternalProject_Add(mvisus
                         -DBOOST_ROOT:PATH=${LIBRARIES_INSTALL_PREFIX}/boost
                         -DBoost_USE_STATIC_RUNTIME:BOOL=${MVISUS_MSVC_STATIC_RUNTIME}
                         -DBoost_USE_STATIC_LIBS:BOOL=ON
-                        -DBoost_ADDITIONAL_VERSIONS:STRING="1.78"
+                        -DBoost_ADDITIONAL_VERSIONS:STRING=1.78
                         -DBoost_NO_WARN_NEW_VERSIONS:BOOL=ON
                         -DIMGUI_PATH:PATH=${IMGUI_SOURCE_DIR}
                         -DSTB_SOURCE_DIR:PATH=${STB_SOURCE_DIR}
