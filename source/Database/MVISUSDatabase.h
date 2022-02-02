@@ -1,26 +1,25 @@
 /*
- * Application.h
+ * MVISUSDatabase.h
  *
  * This file is part of the "mvisus" project.
  * See "LICENSE.md" for license information.
  */
 
-#ifndef MVISUS_APPLICATION_H
-#define MVISUS_APPLICATION_H
+#ifndef MVISUS_DATABASE_H
+#define MVISUS_DATABASE_H
 
 #include <string>
 #include <memory>
 #include <vector>
 #include <nlohmann/json.hpp>
 #include <argparse/argparse.hpp>
-#include <Database/MVISUSDatabase.h>
 
 namespace mvisus
 {
 
 
     /**
-    \brief Application interface.
+    \brief MVISUSDatabase interface.
     \remarks Here is an example to print the attributes of all displays:
     \code
     auto myDisplayList = arcl::Display::InstantiateList();
@@ -37,27 +36,12 @@ namespace mvisus
     }
     \endcode
     */
-    class Application
+    class MVISUSDatabase
     {
         public:
-            class Config
-            {
-                public:
-                    Config();
-                    ~Config(){};
-                    bool Load(int argc, char** argv);
-
-                private:
-                    bool Validate();
-
-                private:
-                    nlohmann::json mConfigVariables, mConfigValues;
-                    argparse::ArgumentParser mProgram;
-
-            };
 
         public:
-            void Run(Config& config);
+            bool Connect();
 
     };
 
