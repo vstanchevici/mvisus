@@ -28,17 +28,17 @@ namespace mvisus
         mConfigVariables = {
                     {"render_system",{  {"env", "MVISUS_RENDER_SYSTEM"},
                                         {"cnf", "render_system"},
-                                        {"cmd", {"render_system", "r"}}}},
+                                        {"cmd", {"--render_system", "-r"}}}},
                     {"network_data",{   {"env", "MVISUS_NETWORK_DATA"},
                                         {"cnf", "network_data"},
-                                        {"cmd", {"network_data", "n"}}}}
+                                        {"cmd", {"--network_data", "-n"}}}}
         };
 
         for (nlohmann::json::iterator it = mConfigVariables.begin(); it != mConfigVariables.end(); ++it)
         {
             for (auto& var : (*it)["cmd"])
             {
-                mProgram.add_argument((var.get<std::string>().length() == 1 ? "-" : "--") + var.get<std::string>());
+                mProgram.add_argument(var.get<std::string>());
             }
 
         }
@@ -74,7 +74,7 @@ namespace mvisus
             {
                 for (auto& var : (*it)["cmd"])
                 {
-                    std::string& var_name = (var.get<std::string>().length() == 1 ? "-" : "--") + var.get<std::string>();
+                    std::string& var_name = var.get<std::string>();
                     if (mProgram.is_used(var_name))
                     {
                         mConfigValues[it.key()] = mProgram.get<std::string>(var_name);
@@ -85,7 +85,8 @@ namespace mvisus
 
         }
 
-        std::cout << mConfigValues.dump() << std::endl;
+        if (mConfigValues.is_object())
+            std::cout << mConfigValues.dump() << std::endl;
 
         std::cin.get();
         return true;

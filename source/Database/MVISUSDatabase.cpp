@@ -16,6 +16,8 @@
 #include <iostream>
 #include <iomanip>
 
+#include <streambuf>
+
 //https://www.boost.org/doc/libs/1_78_0/libs/serialization/doc/serialization.html
 //https://stackoverflow.com/questions/41801826/do-cereal-and-boost-serialization-use-zero-copy
 
@@ -49,6 +51,34 @@ class player
 
 BOOST_CLASS_VERSION(player, 1)
 
+
+
+/*
+size_t length = 100;
+auto pBuf = new char[length]; // allocate memory
+
+struct membuf : std::streambuf // derive because std::streambuf constructor is protected
+{
+    membuf(char* p, size_t size)
+    {
+        setp(p, p + size); // set start end end pointers
+    }
+    size_t written() { return pptr() - pbase(); } // how many bytes were really written?
+};
+
+membuf sbuf(pBuf, length); // our buffer object
+std::ostream out(&sbuf);   // stream using our buffer
+
+out << 12345.654e10 << std::endl;
+out.flush();
+
+std::cout << "Nr of written bytes: " << sbuf.written() << std::endl;
+std::cout << "Content: " << (char*)pBuf << std::endl;
+
+delete[] pBuf; // free memory 
+*/
+
+
 namespace mvisus
 {
    /*
@@ -66,11 +96,11 @@ namespace mvisus
         std::stringstream ss;
 
         {
-            boost::archive::text_oarchive oa(ss);
+            boost::archive::text_oarchive oa(ss, boost::archive::no_header);
             
             player to_save;
-            to_save.username = "bla";
-            to_save.password = "blo";
+            to_save.username = "user_name";
+            to_save.password = "password";
             to_save.inv = {
                     { 1, 17 },
                     { 2, 11 },
@@ -90,7 +120,7 @@ namespace mvisus
 
         player loaded;
         {
-            boost::archive::text_iarchive ia(ss);
+            boost::archive::text_iarchive ia(ss, boost::archive::no_header);
             ia >> loaded;
         }
 
