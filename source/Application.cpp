@@ -7,9 +7,11 @@
 
 #include "Application.h"
 #include <mvisus-version.h>
+#include <build_defs.h>
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+
 
 namespace mvisus
 {
@@ -94,8 +96,8 @@ namespace mvisus
 
     void Application::Run(Config& config)
     {
-        std::cout << "Project Name: " << MVISUS_PROJECT_NAME << std::endl;
-        std::cout << "Project Description: " << MVISUS_PROJECT_DESCRIPTION << std::endl;
+        std::cout << "Project Description   : " << MVISUS_PROJECT_DESCRIPTION << std::endl;
+        std::cout << "Version               : " << software_version << "\n" << std::endl;
         MVISUSDatabase a;
         a.Connect();
     }
